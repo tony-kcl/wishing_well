@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:responsive_framework/responsive_framework.dart';
+import 'package:wishing_well/pages/home/home.dart';
 
 import 'app_bloc_observer/app_bloc_observer.dart';
 import 'route/routes.dart';
@@ -27,6 +28,9 @@ class App extends StatelessWidget {
         providers: [
           BlocProvider<ThemeCubit>(
             create: (_) => ThemeCubit(),
+          ),
+          BlocProvider<HomeBloc>(
+            create: (_) => HomeBloc(),
           ),
         ],
         child: ResponsiveBreakpoints.builder(
