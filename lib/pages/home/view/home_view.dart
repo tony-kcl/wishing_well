@@ -1,9 +1,38 @@
-import 'dart:developer';
+import 'dart:developer' as dev;
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-class HomeView extends StatelessWidget {
+import '../widget/widget.dart';
+
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
+
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin {
+  bool isAnimating = false;
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    );
+
+    _animation = Tween<double>(begin: 0, end: 0.5).animate(_controller);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,29 +55,86 @@ class HomeView extends StatelessWidget {
             const SizedBox(
               height: 7,
             ),
-            Row(
-              children: [
-                const Expanded(
-                  child: SizedBox(),
-                ),
-                Expanded(
-                  child: Container(
-                    color: Colors.yellow,
-                    height: size.height / 3,
-                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                    child: TextFormField(
-                      autocorrect: false,
-                      maxLines: null,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
+            SizedBox(
+              width: size.width,
+              height: size.height / 3,
+              child: Stack(
+                children: [
+                  Positioned(
+                    left: size.width / 3,
+                    child: SizedBox(
+                      width: size.width / 3,
+                      height: size.height / 3,
+                      child: Container(
+                        color: Colors.yellow,
+                        height: size.height / 3,
+                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                        child: TextFormField(
+                          autocorrect: false,
+                          maxLines: null,
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const Expanded(
-                  child: SizedBox(),
-                ),
-              ],
+                  Positioned(
+                    left: 0,
+                    child: SizedBox(
+                      width: size.width / 3,
+                      height: size.height / 3,
+                      child: isAnimating 
+                        ? AnimatedBuilder(
+                            animation: _animation,
+                            builder: (context, child) {
+                              return Transform(
+                                  alignment: Alignment.centerRight,
+                                  transform: Matrix4.rotationY(2 * pi * _animation.value),
+                                  child: SizedBox(
+                                    width: size.width / 3 / 2,
+                                    height: size.height / 3,
+                                    child: CustomPaint(
+                                      painter: TrianglePainter(
+                                        isLeft: true
+                                      ),
+                                    ),
+                                  ),
+                                );
+                            }
+                          )
+                        : const SizedBox(),
+                    ),
+                  ),
+                  Positioned(
+                    left: size.width / 3 * 2,
+                    child: SizedBox(
+                      width: size.width / 3,
+                      height: size.height / 3,
+                      child: isAnimating 
+                        ? AnimatedBuilder(
+                            animation: _animation,
+                            builder: (context, child) {
+                              return Transform(
+                                  alignment: Alignment.centerLeft,
+                                  transform: Matrix4.rotationY(2 * pi * _animation.value),
+                                  child: SizedBox(
+                                    width: size.width / 3 / 2,
+                                    height: size.height / 3,
+                                    child: CustomPaint(
+                                      painter: TrianglePainter(
+                                        isLeft: false
+                                      ),
+                                    ),
+                                  ),
+                                );
+                            }
+                          )
+                        : const SizedBox(),
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(
               height: 7,
@@ -65,7 +151,15 @@ class HomeView extends StatelessWidget {
                     alignment: Alignment.centerRight,
                     child: InkWell(
                       onTap: () {
-                        log('onTap');
+                        dev.log('onTap');
+                        if (mounted) {
+                          setState(() {
+                            isAnimating = true;
+                          });
+                        }
+                        _controller.forward().whenComplete(() {
+       
+                        });
                       },
                       child: Text(
                         '送出',
